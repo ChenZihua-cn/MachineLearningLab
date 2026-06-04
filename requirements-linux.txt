@@ -17,6 +17,7 @@ dingo-gw
 
 # Gravitational wave libraries
 lalsuite
+pycbc
 
 # Python 2/3 compatibility (optional, for legacy code)
 six

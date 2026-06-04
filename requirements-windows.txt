@@ -1,4 +1,4 @@
-# 基础科学计算 (保留原有的)
+# 基础科学计算
 numpy
 scipy
 scikit-learn
@@ -8,11 +8,12 @@ IPython
 jupyterlab
 six
 
-# 深度学习核心 (已确认支持CUDA)
+# 深度学习核心
 torch
 torchvision
 torchaudio
 
-# 符号回归常用库 (Windows友好，即装即用)
-pysr          # 经典库，用演化算法找公式
-# 如果要跑 TPSR 这种基于 Transformer 的模型，直接 git clone 即可，不强制放这里
+# 符号回归常用库 
+pysr
+
+gwpy
