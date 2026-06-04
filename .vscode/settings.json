@@ -4,6 +4,7 @@
         "reportAttributeAccessIssue": "warning",
         "reportOptionalMemberAccess": "warning"
     },
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
     
     // 如果你希望完全关闭这些提示，可以用 "none"
     // "reportAttributeAccessIssue": "none",
