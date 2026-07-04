@@ -31,10 +31,17 @@ times = hp.sample_times.numpy()
 dt = hp.delta_t
 
 # 通过 Hilbert 变换计算瞬时频率和相位
-analytic_signal = hilbert(hp.numpy())
-amplitude = np.abs(analytic_signal)
-phases = np.unwrap(np.angle(analytic_signal))
-freqs = np.gradient(phases) / (2 * np.pi * dt)  # Hz
+
+"""
+Explicit np.ndarray type annotations on all variables tell Pylance what types to expect,
+preventing tuple[Dispatchable] from propagating through the chain.
+"""
+
+hp_np: np.ndarray = np.asarray(hp.numpy())
+analytic_signal: np.ndarray = np.asarray(hilbert(hp_np))
+amplitude: np.ndarray = np.abs(analytic_signal)
+phases: np.ndarray = np.unwrap(np.angle(analytic_signal))
+freqs: np.ndarray = np.gradient(phases) / (2 * np.pi * dt)  # Hz
 
 # Sci-Plot
 plt.figure(figsize=(12, 5))
@@ -54,4 +61,4 @@ plt.title("Instantaneous Phase (mod 2π)")
 plt.tight_layout()
 plt.show()
 
-np.save("waveform_clean.npy", hp.numpy())
+np.save("waveform_clean.npy", hp_np)
