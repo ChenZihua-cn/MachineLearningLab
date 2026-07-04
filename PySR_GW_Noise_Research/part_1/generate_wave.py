@@ -62,3 +62,7 @@ plt.tight_layout()
 plt.show()
 
 np.save("waveform_clean.npy", hp_np)
+np.savez("waveform_processed.npz",
+         times=times, dt=dt,
+         amplitude=amplitude, phases=phases, freqs=freqs)
+print("Saved waveform_clean.npy and waveform_processed.npz")

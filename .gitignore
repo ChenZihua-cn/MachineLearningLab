@@ -2,6 +2,7 @@
 培养计划.md
 .vscode/
 *.npy
+*.npz
 *.pt
 .venv/
 Search_for_GW_Signals/__pycache__/
