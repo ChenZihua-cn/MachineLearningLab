@@ -9,7 +9,6 @@ Part 1.1 — 波形生成
 
 from pycbc.waveform import get_td_waveform
 import numpy as np
-from scipy.signal import hilbert
 import matplotlib.pyplot as plt
 
 # 参数设置
@@ -30,36 +29,51 @@ hp, hc = get_td_waveform(**params)
 times = hp.sample_times.numpy()
 dt = hp.delta_t
 
-# 通过 Hilbert 变换计算瞬时频率和相位
-
-"""
-Explicit np.ndarray type annotations on all variables tell Pylance what types to expect,
-preventing tuple[Dispatchable] from propagating through the chain.
-"""
-
+# 对 face-on 朝向（默认 inclination=0），h+ 和 h× 天然构成解析信号：
+#   h+ = A(t)·cos(Φ(t)),  h× = A(t)·sin(Φ(t))
+#   → analytic = h+ + i·h× = A(t)·exp(i·Φ(t))
+# 无需 Hilbert 变换，彻底避开边界伪影。
 hp_np: np.ndarray = np.asarray(hp.numpy())
-analytic_signal: np.ndarray = np.asarray(hilbert(hp_np))
+hc_np: np.ndarray = np.asarray(hc.numpy())
+
+analytic_signal: np.ndarray = hp_np + 1j * hc_np
 amplitude: np.ndarray = np.abs(analytic_signal)
 phases: np.ndarray = np.unwrap(np.angle(analytic_signal))
 freqs: np.ndarray = np.gradient(phases) / (2 * np.pi * dt)  # Hz
 
-# Sci-Plot
-plt.figure(figsize=(12, 5))
+# Sci-Plot: 2x2 布局
+fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
-plt.subplot(1, 2, 1)
-plt.plot(times, freqs, "b-")
-plt.xlabel("Time [s]")
-plt.ylabel("Instantaneous Frequency [Hz]")
-plt.title("Instantaneous Frequency")
+ax_wave_hp = axes[0, 0]
+ax_wave_hc = axes[0, 1]
+ax_freq = axes[1, 0]
+ax_phase = axes[1, 1]
 
-plt.subplot(1, 2, 2)
-plt.plot(times, phases % (2 * np.pi), "r-")
-plt.xlabel("Time [s]")
-plt.ylabel("Instantaneous Phase [rad]")
-plt.title("Instantaneous Phase (mod 2π)")
+ax_wave_hp.plot(times, hp_np, "b-", linewidth=0.6)
+ax_wave_hp.set_xlabel("Time [s]")
+ax_wave_hp.set_ylabel("Strain")
+ax_wave_hp.set_title(r"$h_+$ Waveform")
+
+ax_wave_hc.plot(times, hc_np, "c-", linewidth=0.6)
+ax_wave_hc.set_xlabel("Time [s]")
+ax_wave_hc.set_ylabel("Strain")
+ax_wave_hc.set_title(r"$h_\times$ Waveform")
+
+ax_freq.plot(times, freqs, "b-")
+ax_freq.set_xlabel("Time [s]")
+ax_freq.set_ylabel("Instantaneous Frequency [Hz]")
+ax_freq.set_title("Instantaneous Frequency")
+
+ax_phase.plot(times, phases % (2 * np.pi), "r-")
+ax_phase.set_xlabel("Time [s]")
+ax_phase.set_ylabel("Instantaneous Phase [rad]")
+ax_phase.set_title("Instantaneous Phase (mod $2\pi$)")
 
 plt.tight_layout()
+plt.savefig("generated_waveform.png")
 plt.show()
+
+print("Saved generated_waveform.png")
 
 np.save("waveform_clean.npy", hp_np)
 np.savez("waveform_processed.npz",
